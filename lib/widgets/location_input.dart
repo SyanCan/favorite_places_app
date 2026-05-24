@@ -8,7 +8,8 @@ import '../screens/map.dart';
 import 'package:latlong2/latlong.dart';
 
 // Web-only import
-import 'location_input_web.dart' if (dart.library.io) 'location_input_mobile.dart'
+import 'location_input_web.dart'
+    if (dart.library.io) 'location_input_mobile.dart'
     as location_helper;
 
 class LocationInput extends StatefulWidget {
@@ -96,7 +97,8 @@ class _LocationInputState extends State<LocationInput> {
     final picked = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         builder: (ctx) => MapScreen(
-          location: _pickedLocation ??
+          location:
+              _pickedLocation ??
               const PlaceLocation(
                 latitude: -8.6705,
                 longitude: 115.2126,
@@ -117,8 +119,8 @@ class _LocationInputState extends State<LocationInput> {
       'No location chosen',
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
     );
 
     if (_isGettingLocation) {
@@ -153,8 +155,8 @@ class _LocationInputState extends State<LocationInput> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -194,11 +196,11 @@ class _LocationInputState extends State<LocationInput> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              '💡 Di browser: klik "Get Current" lalu izinkan akses lokasi,\natau gunakan "Pick on Map".',
+              'silahkan klik "Get Current" lalu izinkan akses lokasi,\natau gunakan "Pick on Map".',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                  ),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
           ),
       ],

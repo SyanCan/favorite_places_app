@@ -8,9 +8,7 @@ class PlacesScreen extends ConsumerStatefulWidget {
   const PlacesScreen({super.key});
 
   @override
-  ConsumerState<PlacesScreen> createState() {
-    return _PlacesScreenState();
-  }
+  ConsumerState<PlacesScreen> createState() => _PlacesScreenState();
 }
 
 class _PlacesScreenState extends ConsumerState<PlacesScreen> {
@@ -19,6 +17,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
   @override
   void initState() {
     super.initState();
+    // PERBAIKAN: pakai ref.read(provider.notifier) tetap sama
     _placesFuture = ref.read(userPlacesProvider.notifier).loadPlaces();
   }
 
@@ -49,9 +48,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
           builder: (context, snapshot) =>
               snapshot.connectionState == ConnectionState.waiting
                   ? const Center(child: CircularProgressIndicator())
-                  : PlacesList(
-                      places: userPlaces,
-                    ),
+                  : PlacesList(places: userPlaces),
         ),
       ),
     );

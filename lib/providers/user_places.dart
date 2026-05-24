@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:path/path.dart' as path;
 
-// sqflite hanya untuk non-web
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 
@@ -33,17 +32,21 @@ Future<Database> _getDatabase() async {
   return db;
 }
 
-class UserPlacesNotifier extends StateNotifier<List<Place>> {
-  UserPlacesNotifier() : super(const []);
+// PERBAIKAN: Ganti StateNotifier -> Notifier (Riverpod v3)
+class UserPlacesNotifier extends Notifier<List<Place>> {
+  @override
+  List<Place> build() {
+    // State awal: list kosong
+    return [];
+  }
 
   Future<void> loadPlaces() async {
-    if (kIsWeb) {
-      // Web: tidak ada persistent DB, mulai kosong
-      return;
-    }
+    if (kIsWeb) return;
+
     final db = await _getDatabase();
     final data = await db.query('user_places');
-    final places = data.map((row) {
+
+    final List<Place> places = data.map((row) {
       final imgPath = row['image'] as String;
       return Place(
         id: row['id'] as String,
@@ -71,7 +74,6 @@ class UserPlacesNotifier extends StateNotifier<List<Place>> {
     File? savedFile;
 
     if (!kIsWeb && image != null) {
-      // Mobile/Desktop: simpan file ke app directory
       final appDir = await syspaths.getApplicationDocumentsDirectory();
       final filename = path.basename(image.path);
       savedFile = await image.copy('${appDir.path}/$filename');
@@ -102,7 +104,7 @@ class UserPlacesNotifier extends StateNotifier<List<Place>> {
   }
 }
 
-final userPlacesProvider =
-    StateNotifierProvider<UserPlacesNotifier, List<Place>>(
-  (ref) => UserPlacesNotifier(),
+// PERBAIKAN: Ganti StateNotifierProvider -> NotifierProvider (Riverpod v3)
+final userPlacesProvider = NotifierProvider<UserPlacesNotifier, List<Place>>(
+  UserPlacesNotifier.new,
 );

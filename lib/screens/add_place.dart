@@ -33,6 +33,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
       return;
     }
 
+    // PERBAIKAN: cara panggil tetap sama, ref.read(provider.notifier)
     ref.read(userPlacesProvider.notifier).addPlace(
           enteredTitle,
           _selectedLocation!,
