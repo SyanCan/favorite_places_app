@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../models/place.dart';
 import '../screens/map.dart';
 
@@ -7,10 +10,26 @@ class PlaceDetailScreen extends StatelessWidget {
 
   final Place place;
 
-  String get locationImage {
-    final lat = place.location.latitude;
-    final lng = place.location.longitude;
-    return 'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng=&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$lat,$lng&key=AIzaSyDLcwxUggpPZo8lcbH0TB4Crq5SJjtj4ag';
+  Widget _buildMainImage() {
+    if (kIsWeb && place.imageBytes != null) {
+      return Image.memory(
+        place.imageBytes!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    } else if (!kIsWeb && place.image != null) {
+      return Image.file(
+        place.image!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    }
+    return Container(
+      color: Colors.grey,
+      child: const Icon(Icons.image, size: 80),
+    );
   }
 
   @override
@@ -21,12 +40,7 @@ class PlaceDetailScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          Image.file(
-            place.image,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
+          _buildMainImage(),
           Positioned(
             bottom: 0,
             left: 0,
@@ -44,9 +58,50 @@ class PlaceDetailScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage: NetworkImage(locationImage),
+                  child: SizedBox(
+                    height: 150,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      child: FlutterMap(
+                        options: MapOptions(
+                          initialCenter: LatLng(
+                            place.location.latitude,
+                            place.location.longitude,
+                          ),
+                          initialZoom: 15,
+                          interactionOptions: const InteractionOptions(
+                            flags: InteractiveFlag.none,
+                          ),
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.favorite_places',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: LatLng(
+                                  place.location.latitude,
+                                  place.location.longitude,
+                                ),
+                                width: 40,
+                                height: 40,
+                                child: const Icon(
+                                  Icons.location_pin,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Container(
@@ -57,10 +112,7 @@ class PlaceDetailScreen extends StatelessWidget {
                   ),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.black54,
-                      ],
+                      colors: [Colors.transparent, Colors.black54],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),
@@ -69,13 +121,13 @@ class PlaceDetailScreen extends StatelessWidget {
                     place.location.address,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Colors.white,
                         ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
